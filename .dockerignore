@@ -1,0 +1,10 @@
+.git
+.env
+.local
+data
+web/node_modules
+web/dist
+*.exe
+*.pem
+*.log
+**/*.tsbuildinfo

@@ -1,0 +1,27 @@
+# Use this Blueprint when expense-tracker is the repository root.
+# For the current parent repository, use the dashboard instructions in README.md.
+services:
+  - type: web
+    name: penny-expense-tracker
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_ORIGIN
+        sync: false
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_TLS
+        value: "true"
+      - key: DB_CA_CERT
+        sync: false

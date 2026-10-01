@@ -1,0 +1,12 @@
+.env
+data/
+web/node_modules/
+web/dist/
+*.exe
+coverage.out
+playwright-report/
+test-results/
+*.tsbuildinfo
+*.log
+*.pem
+.local/
