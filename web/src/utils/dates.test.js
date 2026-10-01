@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dateLabel, localDate, rangeFor, shiftAnchor } from "./lib";
-
+import { dateLabel, localDate, rangeFor, shiftAnchor } from "./dates.js";
 describe("expense calendar dates", () => {
   it("uses inclusive leap-year month boundaries", () => {
     expect(rangeFor("month", "2024-02-17", "", "")).toEqual({

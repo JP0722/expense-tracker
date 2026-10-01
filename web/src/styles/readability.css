@@ -1,0 +1,58 @@
+/* Keep secondary copy readable on the soft, light surfaces. */
+.muted,
+.panel-heading p,
+.stat-label,
+.stat-foot,
+.field-hint,
+.date-cell,
+.table-footer,
+.category-card p,
+.section-heading p,
+.help-content p,
+.empty-state p,
+.insight-empty p,
+.legend-row > div > span,
+.expense-description div > span {
+  color: #687661;
+}
+.panel-heading p,
+.stat-foot,
+.field-hint,
+.date-cell,
+.table-footer,
+.category-card p,
+.section-heading p {
+  font-size: 11px;
+}
+.expense-description strong,
+.search-field input,
+.table-toolbar > select,
+.legend-row > div > span,
+.legend-row > strong,
+.period-row > div:first-child {
+  font-size: 12px;
+}
+.search-field input::placeholder,
+input::placeholder,
+textarea::placeholder {
+  color: #73816a;
+}
+.category-badge {
+  color: #4e6043;
+}
+.segmented button,
+.sidebar nav button,
+.table-toolbar > select {
+  color: #65745b;
+}
+.date-control input {
+  color-scheme: light;
+}
+@media (max-width: 680px) {
+  .table-footer {
+    font-size: 10px;
+  }
+  .table-toolbar > select {
+    max-width: 155px;
+  }
+}
