@@ -8,6 +8,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"expense-tracker/internal/ai"
 	"io"
 	"log"
 	"mime"
@@ -22,10 +23,12 @@ import (
 )
 
 type Server struct {
-	db      *sql.DB
-	secure  bool
-	origin  string
-	limiter *rateLimiter
+	db        *sql.DB
+	secure    bool
+	origin    string
+	limiter   *rateLimiter
+	extractor ai.Extractor
+	aiQuota   *draftQuota
 }
 type userKey struct{}
 type User struct {
@@ -66,8 +69,17 @@ func (l *rateLimiter) allow(key string, limit int) bool {
 	return e.count <= limit
 }
 
-func New(db *sql.DB, secure bool, origin, staticDir string) http.Handler {
+// WithAI enables draft generation. Without it, the endpoint returns 503.
+func WithAI(extractor ai.Extractor) func(*Server) {
+	return func(s *Server) { s.extractor = extractor }
+}
+
+func New(db *sql.DB, secure bool, origin, staticDir string, options ...func(*Server)) http.Handler {
 	s := &Server{db: db, secure: secure, origin: strings.TrimRight(origin, "/"), limiter: &rateLimiter{entries: make(map[string]rateEntry)}}
+	s.aiQuota = &draftQuota{}
+	for _, option := range options {
+		option(s)
+	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /api/health", func(w http.ResponseWriter, r *http.Request) {
 		if err := db.PingContext(r.Context()); err != nil {
@@ -87,6 +99,8 @@ func New(db *sql.DB, secure bool, origin, staticDir string) http.Handler {
 	mux.Handle("GET /api/expenses", s.auth(http.HandlerFunc(s.expenses)))
 	mux.Handle("GET /api/expenses/export", s.auth(http.HandlerFunc(s.export)))
 	mux.Handle("POST /api/expenses", s.auth(http.HandlerFunc(s.createExpense)))
+	mux.Handle("POST /api/expenses/batch", s.auth(http.HandlerFunc(s.createExpenseBatch)))
+	mux.Handle("POST /api/ai/expense-drafts", s.auth(http.HandlerFunc(s.expenseDrafts)))
 	mux.Handle("PUT /api/expenses/{id}", s.auth(http.HandlerFunc(s.updateExpense)))
 	mux.Handle("DELETE /api/expenses/{id}", s.auth(http.HandlerFunc(s.deleteExpense)))
 	mux.HandleFunc("/api/", func(w http.ResponseWriter, r *http.Request) { fail(w, 404, "Endpoint not found") })

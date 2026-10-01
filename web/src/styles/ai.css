@@ -1,0 +1,19 @@
+.expense-heading-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.expense-draft {
+  border: 1px solid #d7e3df;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 18px 0;
+  min-width: 0;
+}
+.expense-draft legend {
+  font-weight: 600;
+  padding: 0 6px;
+}
+.expense-draft:disabled {
+  opacity: 0.75;
+}

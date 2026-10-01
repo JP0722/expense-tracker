@@ -103,6 +103,7 @@ func migrate(ctx context.Context, db *sql.DB, driver string) error {
 		fmt.Sprintf(`CREATE TABLE IF NOT EXISTS sessions (token_hash VARCHAR(64) PRIMARY KEY, user_id %s NOT NULL, expires_at BIGINT NOT NULL, FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE)`, ref),
 		fmt.Sprintf(`CREATE TABLE IF NOT EXISTS categories (id %s, user_id %s NOT NULL, name VARCHAR(40) NOT NULL, color VARCHAR(7) NOT NULL, is_default INTEGER NOT NULL DEFAULT 0, UNIQUE(user_id,name), FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE)`, id, ref),
 		fmt.Sprintf(`CREATE TABLE IF NOT EXISTS expenses (id %s, user_id %s NOT NULL, category_id %s NOT NULL, title VARCHAR(120) NOT NULL, amount_cents BIGINT NOT NULL, expense_date VARCHAR(10) NOT NULL, notes VARCHAR(500) NOT NULL DEFAULT '', created_at BIGINT NOT NULL, FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE, FOREIGN KEY(category_id) REFERENCES categories(id))`, id, ref, ref),
+		fmt.Sprintf(`CREATE TABLE IF NOT EXISTS expense_batches (user_id %s NOT NULL, request_id VARCHAR(64) NOT NULL, payload_hash VARCHAR(64) NOT NULL, expense_ids TEXT NOT NULL, PRIMARY KEY(user_id,request_id), FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE)`, ref),
 	}
 	for _, s := range statements {
 		if _, err := db.ExecContext(ctx, s); err != nil {

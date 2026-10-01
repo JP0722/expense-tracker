@@ -16,6 +16,7 @@ import { PeriodBreakdown } from "../components/reports/PeriodBreakdown.jsx";
 import { ExpensesPanel } from "../components/expenses/ExpensesPanel.jsx";
 import { Toast } from "../components/ui/Toast.jsx";
 import { ExpenseForm } from "../components/expenses/ExpenseForm.jsx";
+import { AIExpenseDialog } from "../components/expenses/AIExpenseDialog.jsx";
 import { CategoryForm } from "../components/categories/CategoryForm.jsx";
 import { ConfirmDelete } from "../components/ui/ConfirmDelete.jsx";
 import { HelpDialog } from "../components/ui/HelpDialog.jsx";
@@ -50,6 +51,7 @@ export function DashboardPage({ user, onSignOut }) {
   const [toast, setToast] = useState("");
   const [exporting, setExporting] = useState(false);
   const [expenseModal, setExpenseModal] = useState(null);
+  const [aiOpen, setAiOpen] = useState(false);
   const [categoryModal, setCategoryModal] = useState(null);
   const [deleting, setDeleting] = useState(null);
   const [help, setHelp] = useState(false);
@@ -61,6 +63,7 @@ export function DashboardPage({ user, onSignOut }) {
     }
   }, [toast]);
   function saved(message) {
+    setAiOpen(false);
     setExpenseModal(null);
     setCategoryModal(null);
     setDeleting(null);
@@ -129,17 +132,27 @@ export function DashboardPage({ user, onSignOut }) {
                   : "Every expense has a story. Here’s the bigger picture."}
               </p>
             </div>
-            <button
-              className="button primary"
-              onClick={() =>
-                view === "categories"
-                  ? setCategoryModal({ category: null })
-                  : setExpenseModal({ expense: null })
-              }
-            >
-              <Plus size={18} />
-              {view === "categories" ? "New category" : "Add expense"}
-            </button>
+            <div className="expense-heading-actions">
+              {view !== "categories" && (
+                <button
+                  className="button secondary"
+                  onClick={() => setAiOpen(true)}
+                >
+                  Add with AI
+                </button>
+              )}
+              <button
+                className="button primary"
+                onClick={() =>
+                  view === "categories"
+                    ? setCategoryModal({ category: null })
+                    : setExpenseModal({ expense: null })
+                }
+              >
+                <Plus size={18} />
+                {view === "categories" ? "New category" : "Add expense"}
+              </button>
+            </div>
           </section>
           <ErrorText>{error}</ErrorText>
           {error && (
@@ -235,6 +248,17 @@ export function DashboardPage({ user, onSignOut }) {
           categories={categories}
           onClose={() => setExpenseModal(null)}
           onSave={saved}
+        />
+      )}
+      {aiOpen && (
+        <AIExpenseDialog
+          categories={categories}
+          onClose={() => setAiOpen(false)}
+          onSave={saved}
+          onManual={() => {
+            setAiOpen(false);
+            setExpenseModal({ expense: null });
+          }}
         />
       )}
       {categoryModal && (

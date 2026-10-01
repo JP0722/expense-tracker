@@ -6,9 +6,11 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
+	"expense-tracker/internal/ai"
 	"expense-tracker/internal/app"
 	"github.com/joho/godotenv"
 )
@@ -35,7 +37,11 @@ func main() {
 	if static == "" {
 		static = "web/dist"
 	}
-	srv := &http.Server{Addr: ":" + port, Handler: app.New(db, secure, origin, static), ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 15 * time.Second, WriteTimeout: 30 * time.Second, IdleTimeout: 60 * time.Second, MaxHeaderBytes: 1 << 16}
+	var options []func(*app.Server)
+	if key := strings.TrimSpace(os.Getenv("GROQ_API_KEY")); key != "" {
+		options = append(options, app.WithAI(ai.NewClient(key, os.Getenv("GROQ_MODEL"))))
+	}
+	srv := &http.Server{Addr: ":" + port, Handler: app.New(db, secure, origin, static, options...), ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 15 * time.Second, WriteTimeout: 30 * time.Second, IdleTimeout: 60 * time.Second, MaxHeaderBytes: 1 << 16}
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 	go func() {
