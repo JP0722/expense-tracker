@@ -2,6 +2,8 @@
 
 A personal expense tracker built with Go, React (JavaScript/JSX), and MySQL. Vite builds the frontend, and Go serves the app and API.
 
+Live demo: https://expense-tracker-hxj3.onrender.com/
+
 ## Included
 
 - Email/password sign-up, sign-in, persistent sessions, and sign-out.
